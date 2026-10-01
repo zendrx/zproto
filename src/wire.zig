@@ -2,7 +2,7 @@ const std = @import("std");
 
 pub const Header = packed struct {
     magic: u32 = 0x525043_01,
-    body_len: u32,
+    len: u32,
     type: msg_type,
     msg_id: u32,
 };
@@ -18,17 +18,17 @@ fn encode(fn_n: []const u8, args: []const []const u8, buff: []u8) ![]const u8 {
     var i: usize = 0;
     buff[i] = @intCast(len);
     i += 1;
-    @memcpy(buf[1..][0..len], fn_n);
+    @memcpy(buff[1..][0..len], fn_n);
     i += len;
-    buf[i] = @intCast(args.len);
+    buff[i] = @intCast(args.len);
     i += 1;
     for (args) |a| {
         buf[i] = @intCast(a.len);
         i += 1;
-        @memcpy(buf[i..][o..a.len], a);
+        @memcpy(buff[i..][o..a.len], a);
         i += a.len;
     }
-    return buf[0..i];
+    return buff[0..i];
 }
 
 fn decode(data: []const u8, args_out: [][]const u8) !struct { name: []const u8, args: [][]const u8 } {
